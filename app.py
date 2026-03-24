@@ -16,9 +16,9 @@ MATTE_BLACK = "#000000"
 STARK_WHITE = "#FFFFFF"
 SLATE_GREY = "#4A4A4A"
 
-LOGO_URL = "https://raw.githubusercontent.com/peterpan6604/ai-readiness/main/logo.png"
+LOGO_URL = "https://raw.githubusercontent.com/peterpan6604/ai-readiness/main/Logo.png"
 
-ICON_URL = "https://raw.githubusercontent.com/peterpan6604/ai-readiness/main/icon.png"
+ICON_URL = "https://raw.githubusercontent.com/peterpan6604/ai-readiness/main/Icon.png"
 
 st.set_page_config(page_title="ODYSSEY AI READINESS", layout="centered", page_icon=ICON_URL)
 
