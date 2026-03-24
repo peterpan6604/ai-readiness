@@ -1,8 +1,10 @@
 import streamlit as st
 import plotly.graph_objects as go
 import smtplib
+import io
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from fpdf import FPDF
 
 # --- ODYSSEY BRAND GUIDELINES ---
 ODYSSEY_GOLD = "#F1B500"
@@ -115,8 +117,192 @@ st.markdown(f"""
         letter-spacing: 1px;
         margin-top: 6px;
     }}
+
+    div[data-testid="stDownloadButton"] > button {{
+        background-color: {ODYSSEY_GOLD};
+        color: {MATTE_BLACK};
+        border-radius: 0px;
+        width: 100%;
+        height: 3.5em;
+        font-weight: 800;
+        border: none;
+        text-transform: uppercase;
+    }}
+    div[data-testid="stDownloadButton"] > button:hover {{
+        background-color: {STARK_WHITE};
+        color: {MATTE_BLACK};
+    }}
 </style>
 """, unsafe_allow_html=True)
+
+
+# --- PDF GENERATION ---
+def generate_pdf(user_name, school_name, scores, detailed_actions):
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=25)
+    pdf.add_page()
+
+    # Full page dark background
+    pdf.set_fill_color(26, 26, 26)
+    pdf.rect(0, 0, 210, 297, 'F')
+
+    # Gold top bar
+    pdf.set_fill_color(241, 181, 0)
+    pdf.rect(0, 0, 210, 8, 'F')
+
+    # Title
+    pdf.set_y(20)
+    pdf.set_font('Helvetica', 'B', 28)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(0, 12, 'ODYSSEY', ln=True)
+
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(241, 181, 0)
+    pdf.cell(0, 6, 'AI READINESS ASSESSMENT', ln=True)
+
+    # Gold underline
+    pdf.set_fill_color(241, 181, 0)
+    pdf.rect(10, pdf.get_y() + 2, 60, 2, 'F')
+    pdf.ln(10)
+
+    # User details
+    pdf.set_font('Helvetica', '', 12)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(0, 8, f'{user_name}  |  {school_name}', ln=True)
+    pdf.ln(5)
+
+    # Scores box
+    pdf.set_fill_color(0, 0, 0)
+    pdf.set_draw_color(74, 74, 74)
+    box_y = pdf.get_y()
+    pdf.rect(10, box_y, 190, 35, 'DF')
+
+    pdf.set_y(box_y + 5)
+    pdf.set_x(15)
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(241, 181, 0)
+    pdf.cell(0, 6, 'YOUR SCORES (0-3)', ln=True)
+
+    pdf.set_x(15)
+    pdf.set_font('Courier', 'B', 12)
+    pdf.set_text_color(255, 255, 255)
+    pillars = ['POLICY', 'PROCESS', 'PEOPLE', 'PROOF']
+    score_line = '    '.join([f'{p}: {round(scores[i], 1)}' for i, p in enumerate(pillars)])
+    pdf.cell(0, 8, score_line, ln=True)
+
+    avg_score = sum(scores) / 4
+    pdf.set_x(15)
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_text_color(180, 180, 180)
+    pdf.cell(0, 6, f'Average: {round(avg_score, 1)}/3', ln=True)
+
+    pdf.set_y(box_y + 40)
+
+    # Intro text
+    pdf.set_font('Helvetica', '', 10)
+    pdf.set_text_color(220, 220, 220)
+    pdf.multi_cell(190, 5,
+        'None of this is pass or fail. The scores give you a snapshot of where '
+        'things stand, and the actions below focus on where the biggest gaps are. '
+        'For any pillar scoring below 2, the detail is expanded.'
+    )
+    pdf.ln(8)
+
+    # Action plans per pillar
+    for idx, p_name in enumerate(pillars):
+        p_score = scores[idx]
+        p_actions = detailed_actions[p_name]
+
+        if pdf.get_y() > 230:
+            pdf.add_page()
+            pdf.set_fill_color(26, 26, 26)
+            pdf.rect(0, 0, 210, 297, 'F')
+            pdf.set_fill_color(241, 181, 0)
+            pdf.rect(0, 0, 210, 4, 'F')
+            pdf.set_y(15)
+
+        # Pillar header
+        pdf.set_font('Helvetica', 'B', 14)
+        pdf.set_text_color(241, 181, 0)
+        pdf.cell(0, 8, f'{p_name}  (Score: {round(p_score, 1)}/3)', ln=True)
+
+        pdf.set_fill_color(241, 181, 0)
+        pdf.rect(10, pdf.get_y(), 40, 1.5, 'F')
+        pdf.ln(5)
+
+        for title, desc in p_actions:
+            if pdf.get_y() > 245:
+                pdf.add_page()
+                pdf.set_fill_color(26, 26, 26)
+                pdf.rect(0, 0, 210, 297, 'F')
+                pdf.set_fill_color(241, 181, 0)
+                pdf.rect(0, 0, 210, 4, 'F')
+                pdf.set_y(15)
+
+            # Gold left bar
+            bar_y = pdf.get_y()
+            pdf.set_fill_color(241, 181, 0)
+            pdf.rect(10, bar_y, 2, 3, 'F')
+
+            # Action title
+            pdf.set_x(16)
+            pdf.set_font('Helvetica', 'B', 10)
+            pdf.set_text_color(241, 181, 0)
+            pdf.cell(0, 5, title.upper(), ln=True)
+
+            # Action description
+            pdf.set_x(16)
+            pdf.set_font('Helvetica', '', 9)
+            pdf.set_text_color(200, 200, 200)
+            pdf.multi_cell(180, 4.5, desc)
+            pdf.ln(5)
+
+        pdf.ln(3)
+
+    # CTA box
+    if pdf.get_y() > 235:
+        pdf.add_page()
+        pdf.set_fill_color(26, 26, 26)
+        pdf.rect(0, 0, 210, 297, 'F')
+        pdf.set_fill_color(241, 181, 0)
+        pdf.rect(0, 0, 210, 4, 'F')
+        pdf.set_y(15)
+
+    cta_y = pdf.get_y()
+    pdf.set_fill_color(34, 34, 34)
+    pdf.set_draw_color(241, 181, 0)
+    pdf.rect(10, cta_y, 190, 30, 'DF')
+
+    pdf.set_y(cta_y + 5)
+    pdf.set_x(15)
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(0, 5, 'WHAT NEXT?', ln=True)
+
+    pdf.set_x(15)
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_text_color(200, 200, 200)
+    pdf.multi_cell(180, 4.5,
+        'This is meant to be a conversation starter, not a finished strategy. '
+        'If you want to talk through these results or need support putting a plan '
+        'together, get in touch: peter@odysseylearningsolutions.com'
+    )
+
+    # Sign-off
+    pdf.ln(10)
+    pdf.set_font('Helvetica', 'B', 14)
+    pdf.set_text_color(241, 181, 0)
+    pdf.cell(0, 6, 'PETER', ln=True)
+    pdf.set_font('Helvetica', '', 8)
+    pdf.set_text_color(180, 180, 180)
+    pdf.cell(0, 4, 'FOUNDER  |  ODYSSEY LEARNING SOLUTIONS', ln=True)
+    pdf.cell(0, 4, 'peter@odysseylearningsolutions.com', ln=True)
+
+    # Bottom gold bar
+    pdf.set_fill_color(241, 181, 0)
+    pdf.rect(0, 289, 210, 8, 'F')
+
+    return bytes(pdf.output())
 
 
 # --- EMAIL FUNCTION ---
@@ -151,7 +337,7 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
                 <p style="font-size: 14px; line-height: 1.6;">None of this is pass or fail. It's a starting point for working out where to focus first.</p>
 
                 <div style="background-color: {MATTE_BLACK}; padding: 20px; border: 1px solid {SLATE_GREY}; margin: 25px 0;">
-                    <h3 style="margin-top: 0; color: {ODYSSEY_GOLD}; font-size: 16px; text-transform: uppercase;">Your Scores (0–3)</h3>
+                    <h3 style="margin-top: 0; color: {ODYSSEY_GOLD}; font-size: 16px; text-transform: uppercase;">Your Scores (0-3)</h3>
                     <p style="font-size: 14px; margin: 0; font-family: 'Courier New', monospace; color: {STARK_WHITE};">{scores_summary}</p>
                 </div>
 
@@ -189,7 +375,7 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
         server.quit()
         return True
     except Exception as e:
-        st.error(f"SYSTEM ERROR: {e}")
+        st.error(f"Email couldn't be sent — but your PDF download is ready below. ({e})")
         return False
 
 
@@ -201,7 +387,7 @@ st.title("WHERE DOES YOUR SCHOOL STAND?")
 st.markdown(
     f'<p style="font-size: 14px; line-height: 1.6; color: {STARK_WHITE}; margin-bottom: 25px;">'
     'Answer 20 questions across four areas — Policy, Process, People and Proof — '
-    'and get a personalised action plan sent straight to your inbox.</p>',
+    'and get a personalised action plan you can download straight away.</p>',
     unsafe_allow_html=True
 )
 
@@ -220,9 +406,6 @@ st.markdown(f'<div style="width: 100%; height: 2px; background: {ODYSSEY_GOLD}; 
 
 
 # --- ASSESSMENT QUESTIONS & SCORING ---
-# Each option is a tuple: (display_text, score)
-# This removes the fragile score_map and makes scoring explicit per question
-
 pillars_data = {
     "POLICY": [
         (
@@ -326,10 +509,9 @@ for i, (p_name, qs) in enumerate(pillars_data.items()):
         for j, (question, options) in enumerate(qs):
             option_labels = [opt[0] for opt in options]
             selected = st.radio(question, option_labels, key=f"{p_name}_{j}")
-            # Find the score for the selected option
             score = next(opt[1] for opt in options if opt[0] == selected)
             p_scores.append(score)
-            if selected != option_labels[0]:  # Count as answered if not default
+            if selected != option_labels[0]:
                 total_answered += 1
         scores.append(sum(p_scores) / 5)
 
@@ -345,7 +527,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# --- ACTION PLAN CONTENT (written in Pete's voice) ---
+# --- ACTION PLAN CONTENT ---
 detailed_actions = {
     "POLICY": [
         (
@@ -508,9 +690,41 @@ if st.button("GENERATE MY ACTION PLAN"):
                     )
                     plan_html += f"<p style='margin-bottom: 15px;'><strong>{title}</strong><br><span style='font-size: 13px; color: #ccc; line-height: 1.6;'>{desc}</span></p>"
 
-        # Build score summary string
         score_sum = f"POLICY: {round(scores[0], 1)} | PROCESS: {round(scores[1], 1)} | PEOPLE: {round(scores[2], 1)} | PROOF: {round(scores[3], 1)}"
 
-        if send_email(email, name, school if school else "your school", score_sum, plan_html):
-            st.success("Done — check your inbox. Your action plan is on its way.")
-            st.balloons()
+        # --- PDF DOWNLOAD (always works, no firewall issues) ---
+        st.markdown(f'<div style="width: 100%; height: 2px; background: {ODYSSEY_GOLD}; margin: 25px 0 15px 0;"></div>', unsafe_allow_html=True)
+
+        pdf_bytes = generate_pdf(
+            name,
+            school if school else "your school",
+            scores,
+            detailed_actions
+        )
+
+        school_slug = (school or "school").lower().replace(" ", "-").replace("/", "-")
+        filename = f"ai-readiness-{school_slug}.pdf"
+
+        st.download_button(
+            label="DOWNLOAD YOUR ACTION PLAN (PDF)",
+            data=pdf_bytes,
+            file_name=filename,
+            mime="application/pdf"
+        )
+
+        # --- EMAIL (attempt — graceful failure if firewall blocks it) ---
+        st.markdown(
+            f'<p style="font-size: 12px; color: {SLATE_GREY}; margin-top: 10px;">'
+            'We\'ll also try to send a copy to your email. If it doesn\'t arrive '
+            '(school firewalls can be strict), the PDF above has everything you need.</p>',
+            unsafe_allow_html=True
+        )
+
+        email_sent = send_email(email, name, school if school else "your school", score_sum, plan_html)
+
+        if email_sent:
+            st.success("Done. Your PDF is ready and a copy has been sent to your inbox.")
+        else:
+            st.info("Your PDF is ready above. The email didn't go through — likely a firewall issue — but you've got everything you need.")
+
+        st.balloons()
