@@ -12,7 +12,7 @@ STARK_WHITE = "#FFFFFF"
 SLATE_GREY = "#4A4A4A"
 
 # PASTE YOUR LOGO URL HERE (Link to your GitHub raw image)
-LOGO_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/ai-readiness/main/logo.png"
+LOGO_URL = "https://raw.githubusercontent.com/peterpan6604/ai-readiness/main/logo.png"
 
 st.set_page_config(page_title="ODYSSEY AI READINESS", layout="centered")
 
