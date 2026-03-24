@@ -136,6 +136,24 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
+# --- PDF TEXT HELPER ---
+def clean_text(text):
+    """Replace Unicode characters that crash fpdf2's built-in fonts."""
+    replacements = {
+        '\u2014': '-',   # em dash
+        '\u2013': '-',   # en dash
+        '\u2018': "'",   # left single quote
+        '\u2019': "'",   # right single quote (curly apostrophe)
+        '\u201c': '"',   # left double quote
+        '\u201d': '"',   # right double quote
+        '\u2026': '...', # ellipsis
+        '\u00a0': ' ',   # non-breaking space
+    }
+    for char, replacement in replacements.items():
+        text = text.replace(char, replacement)
+    return text
+
+
 # --- PDF GENERATION ---
 def generate_pdf(user_name, school_name, scores, detailed_actions):
     pdf = FPDF()
@@ -168,7 +186,7 @@ def generate_pdf(user_name, school_name, scores, detailed_actions):
     # User details
     pdf.set_font('Helvetica', '', 12)
     pdf.set_text_color(255, 255, 255)
-    pdf.cell(0, 8, f'{user_name}  |  {school_name}', ln=True)
+    pdf.cell(0, 8, clean_text(f'{user_name}  |  {school_name}'), ln=True)
     pdf.ln(5)
 
     # Scores box
@@ -201,11 +219,11 @@ def generate_pdf(user_name, school_name, scores, detailed_actions):
     # Intro text
     pdf.set_font('Helvetica', '', 10)
     pdf.set_text_color(220, 220, 220)
-    pdf.multi_cell(190, 5,
+    pdf.multi_cell(190, 5, clean_text(
         'None of this is pass or fail. The scores give you a snapshot of where '
         'things stand, and the actions below focus on where the biggest gaps are. '
         'For any pillar scoring below 2, the detail is expanded.'
-    )
+    ))
     pdf.ln(8)
 
     # Action plans per pillar
@@ -248,13 +266,13 @@ def generate_pdf(user_name, school_name, scores, detailed_actions):
             pdf.set_x(16)
             pdf.set_font('Helvetica', 'B', 10)
             pdf.set_text_color(241, 181, 0)
-            pdf.cell(0, 5, title.upper(), ln=True)
+            pdf.cell(0, 5, clean_text(title.upper()), ln=True)
 
             # Action description
             pdf.set_x(16)
             pdf.set_font('Helvetica', '', 9)
             pdf.set_text_color(200, 200, 200)
-            pdf.multi_cell(180, 4.5, desc)
+            pdf.multi_cell(180, 4.5, clean_text(desc))
             pdf.ln(5)
 
         pdf.ln(3)
@@ -282,11 +300,11 @@ def generate_pdf(user_name, school_name, scores, detailed_actions):
     pdf.set_x(15)
     pdf.set_font('Helvetica', '', 9)
     pdf.set_text_color(200, 200, 200)
-    pdf.multi_cell(180, 4.5,
+    pdf.multi_cell(180, 4.5, clean_text(
         'This is meant to be a conversation starter, not a finished strategy. '
         'If you want to talk through these results or need support putting a plan '
         'together, get in touch: peter@odysseylearningsolutions.com'
-    )
+    ))
 
     # Sign-off
     pdf.ln(10)
