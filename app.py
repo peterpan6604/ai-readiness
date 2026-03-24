@@ -18,17 +18,31 @@ SLATE_GREY = "#4A4A4A"
 
 LOGO_URL = "https://raw.githubusercontent.com/peterpan6604/ai-readiness/main/logo.png"
 
-st.set_page_config(page_title="ODYSSEY AI READINESS", layout="centered", page_icon=LOGO_URL)
+ICON_URL = "https://raw.githubusercontent.com/peterpan6604/ai-readiness/main/icon.png"
+
+st.set_page_config(page_title="ODYSSEY AI READINESS", layout="centered", page_icon=ICON_URL)
 
 
 @st.cache_data
 def get_logo_path():
-    """Download logo once and cache for PDF embedding."""
+    """Download wordmark logo once and cache for PDF embedding."""
     try:
         logo_path = os.path.join(tempfile.gettempdir(), "odyssey_logo.png")
         if not os.path.exists(logo_path):
             urllib.request.urlretrieve(LOGO_URL, logo_path)
         return logo_path
+    except Exception:
+        return None
+
+
+@st.cache_data
+def get_icon_path():
+    """Download AI head icon once and cache for PDF embedding."""
+    try:
+        icon_path = os.path.join(tempfile.gettempdir(), "odyssey_icon.png")
+        if not os.path.exists(icon_path):
+            urllib.request.urlretrieve(ICON_URL, icon_path)
+        return icon_path
     except Exception:
         return None
 
@@ -169,6 +183,7 @@ def clean_text(text):
 # --- PDF GENERATION ---
 def generate_pdf(user_name, school_name, scores, detailed_actions):
     logo_path = get_logo_path()
+    icon_path = get_icon_path()
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=30)
 
@@ -181,13 +196,13 @@ def generate_pdf(user_name, school_name, scores, detailed_actions):
         pdf.rect(0, 289, 210, 8, 'F')
 
     def draw_continuation_header():
-        if logo_path:
-            pdf.image(logo_path, x=178, y=7, w=14)
+        if icon_path:
+            pdf.image(icon_path, x=180, y=6, w=12)
         pdf.set_font('Helvetica', 'B', 7)
         pdf.set_text_color(100, 100, 100)
         saved_y = pdf.get_y()
-        pdf.set_xy(145, 9)
-        pdf.cell(30, 4, 'ODYSSEY  |  AI READINESS', align='R')
+        pdf.set_xy(140, 9)
+        pdf.cell(35, 4, 'ODYSSEY  |  AI READINESS', align='R')
         pdf.set_y(saved_y)
 
     def new_page():
@@ -351,9 +366,9 @@ def generate_pdf(user_name, school_name, scores, detailed_actions):
     pdf.ln(12)
     signoff_y = pdf.get_y()
 
-    if logo_path:
-        pdf.image(logo_path, x=15, y=signoff_y, w=22)
-        text_x = 42
+    if icon_path:
+        pdf.image(icon_path, x=15, y=signoff_y, w=18)
+        text_x = 38
     else:
         text_x = 15
 
@@ -387,7 +402,8 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
             <div style="max-width: 600px; margin: auto; background-color: {DEEP_CHARCOAL}; border: 2px solid {ODYSSEY_GOLD}; padding: 40px; color: {STARK_WHITE};">
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="{LOGO_URL}" width="80" style="margin-bottom: 10px;" alt="Odyssey Learning Solutions">
+                    <img src="{ICON_URL}" width="50" style="margin-bottom: 8px;"><br>
+                    <img src="{LOGO_URL}" width="180" alt="Odyssey Learning Solutions">
                 </div>
                 <div style="text-align: left; border-bottom: 6px solid {ODYSSEY_GOLD}; padding-bottom: 10px; margin-bottom: 30px;">
                     <h1 style="color: {STARK_WHITE}; margin: 0; font-size: 28px; letter-spacing: 2px;">ODYSSEY</h1>
@@ -432,7 +448,12 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
 
 
 # --- APP UI ---
-st.markdown(f'<div class="logo-container"><img src="{LOGO_URL}" width="120"></div>', unsafe_allow_html=True)
+st.markdown(f"""
+<div class="logo-container">
+    <img src="{ICON_URL}" width="60" style="margin-bottom: 8px;"><br>
+    <img src="{LOGO_URL}" width="200">
+</div>
+""", unsafe_allow_html=True)
 st.caption("AI READINESS TOOL")
 st.title("WHERE DOES YOUR SCHOOL STAND?")
 
