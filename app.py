@@ -14,71 +14,75 @@ CARD_BG = "#141414"
 
 st.set_page_config(page_title="Odyssey AI Readiness", layout="centered")
 
-# Custom CSS
+# Custom CSS for Mobile Optimization
 st.markdown(f"""
     <style>
     .stApp {{ background-color: {BG_DARK}; color: white; }}
     .stButton>button {{ background-color: {BRAND_RED}; color: white; border-radius: 8px; width: 100%; height: 3.5em; font-weight: bold; border: none; }}
     div[data-testid="stExpander"] {{ background-color: {CARD_BG}; border: 1px solid #2a2a2a; border-radius: 12px; margin-bottom: 10px; }}
-    .stRadio>label {{ color: #bbb !important; font-size: 14px; }}
-    .stTabs [data-baseweb="tab-list"] {{ gap: 10px; }}
-    .stTabs [data-baseweb="tab"] {{ background-color: {CARD_BG}; border-radius: 5px; padding: 10px; color: white; }}
+    .stRadio>label {{ color: #bbb !important; font-size: 14px; padding-bottom: 10px; }}
+    .stTabs [data-baseweb="tab-list"] {{ gap: 8px; }}
+    .stTabs [data-baseweb="tab"] {{ background-color: {CARD_BG}; border-radius: 5px; padding: 10px; color: white; font-size: 12px; }}
+    li {{ margin-bottom: 8px; font-size: 14px; color: #ddd; list-style-type: none; }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- ENHANCED EMAIL FUNCTION (Deliverability Boosted) ---
+# --- ENHANCED EMAIL FUNCTION ---
 def send_email(to_email, user_name, school_name, scores_summary, plan_html_content):
     try:
         msg = MIMEMultipart("alternative")
         
-        # Friendly Name helps bypass spam filters
-        friendly_name = "Peter - Odyssey Learning Solutions"
+        # Professional Friendly Name and Alias
+        friendly_name = "Peter | Odyssey Learning Solutions"
         msg['From'] = f"{friendly_name} <{st.secrets['email_alias']}>"
         msg['To'] = to_email
         msg['Cc'] = st.secrets['admin_email']
         msg['Reply-To'] = st.secrets['email_alias']
-        msg['Subject'] = f"🛡️ Your 90-Day AI Action Plan: {school_name}"
+        msg['Subject'] = f"🛡️ Your AI Action Plan: {school_name}"
 
-        # HTML Email Body for Professionalism
+        # HTML Email Body
         html_body = f"""
         <html>
-          <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-            <div style="text-align: center; border-bottom: 2px solid {BRAND_RED}; padding-bottom: 10px; margin-bottom: 20px;">
-                <h1 style="color: {BRAND_RED}; margin: 0;">Odyssey Learning Solutions</h1>
-                <p style="color: #666; font-style: italic;">AI Readiness Assessment Results</p>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 25px; border-radius: 10px;">
+            <div style="text-align: center; border-bottom: 3px solid {BRAND_RED}; padding-bottom: 15px; margin-bottom: 25px;">
+                <h1 style="color: {BRAND_RED}; margin: 0; font-size: 24px;">ODYSSEY LEARNING SOLUTIONS</h1>
+                <p style="color: #666; font-style: italic; margin: 5px 0 0 0;">AI Strategy & Readiness Assessment</p>
             </div>
             
             <p>Hello <strong>{user_name}</strong>,</p>
-            <p>It was a pleasure seeing you at the session today. Based on your assessment for <strong>{school_name}</strong>, here is your current readiness profile and your strategic 90-day plan.</p>
+            <p>It was a pleasure seeing you at the session today. Based on your assessment for <strong>{school_name}</strong>, here is your readiness profile and your targeted 90-day plan.</p>
             
-            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 5px solid {BRAND_RED};">
-                <h3 style="margin-top: 0; color: {BRAND_RED};">Strategic Readiness Scores (0-3)</h3>
-                <p style="font-size: 14px; margin: 0;">{scores_summary}</p>
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 5px solid {BRAND_RED}; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: {BRAND_RED}; font-size: 18px;">Readiness Scores (0-3)</h3>
+                <p style="font-size: 14px; margin: 0; font-family: monospace;">{scores_summary}</p>
             </div>
 
-            <h3 style="color: {BRAND_RED}; margin-top: 25px;">Your 90-Day Action Plan</h3>
+            <h3 style="color: {BRAND_RED}; border-bottom: 1px solid #eee; padding-bottom: 5px;">Your 90-Day Action Plan</h3>
             <div style="color: #444;">
                 {plan_html_content}
             </div>
             
-            <p style="margin-top: 30px;"><strong>What's Next?</strong><br>
-            I recommend sharing this plan with your Senior Leadership Team to ensure cross-departmental alignment. If you'd like a follow-up conversation regarding staff CPD or policy development, simply reply to this email.</p>
+            <p style="margin-top: 30px; padding: 15px; background-color: #f0f7ff; border-radius: 8px; font-size: 15px; border: 1px solid #d0e3ff;">
+                <strong>What's Next?</strong><br>
+                I recommend using this as a starting point when thinking about next steps in your AI readiness journey. If you'd like to discuss this in further detail, please simply reply to this email.
+            </p>
             
-            <footer style="margin-top: 40px; padding-top: 10px; border-top: 1px solid #eee; font-size: 11px; color: #999; text-align: center;">
-                Odyssey Learning Solutions | 90-Day AI Implementation Framework
-            </footer>
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; text-align: left;">
+                <p style="margin: 0; font-weight: bold; color: {BRAND_RED};">Peter</p>
+                <p style="margin: 0; font-size: 14px; color: #555;">Founder | Odyssey Learning Solutions</p>
+                <p style="margin: 5px 0 0 0; font-size: 11px; color: #999;"><em>Helping school leaders navigate the AI frontier with confidence.</em></p>
+            </div>
           </body>
         </html>
         """
         
         msg.attach(MIMEText(html_body, 'html'))
         
-        # SMTP Server Connection
         server = smtplib.SMTP(st.secrets["email_host"], st.secrets["email_port"])
         server.starttls()
+        # Authenticates with PRIMARY login, but sends as ALIAS
         server.login(st.secrets["email_user"], st.secrets["email_password"])
         
-        # Send to User and Admin
         recipients = [to_email, st.secrets['admin_email']]
         server.sendmail(st.secrets["email_user"], recipients, msg.as_string())
         server.quit()
@@ -121,43 +125,52 @@ score_map = {
     "Sometimes": 1, "Regularly scheduled": 3, "Embedded": 3, "A few": 1
 }
 
+# PILLAR QUESTIONS
+pillars_data = {
+    "Policy": [
+        ("Formal AI use policy established?", ["No", "In development", "Yes but needs updating", "Yes and current"]),
+        ("AI explicitly referenced in safeguarding policy?", ["No", "Not sure", "Partially", "Yes"]),
+        ("Assessment/Malpractice policy updated?", ["No", "Aware but not done", "In progress", "Complete"]),
+        ("Parental AI consent process established?", ["No", "Planning one", "Complete"]),
+        ("Board/Governor level AI strategy defined?", ["No", "Informal", "Formalized"])
+    ],
+    "Process": [
+        ("Visibility of staff AI tool usage?", ["No idea", "Some awareness", "Mostly", "Full visibility"]),
+        ("Register of approved AI tools created?", ["No", "Planning one", "Partial", "Yes, maintained"]),
+        ("DPIAs completed for current AI tools?", ["No", "Not sure", "For some tools", "Yes, for all"]),
+        ("Feedback loops for staff using AI?", ["No", "Informal", "Regularly scheduled"]),
+        ("Procurement process includes AI-specific vetting?", ["No", "Sometimes", "Always"])
+    ],
+    "People": [
+        ("Named person leading on AI strategy?", ["No", "Informally", "Yes but unsupported", "Yes with dedicated time"]),
+        ("Percentage of staff received formal AI training?", ["None", "Self-directed only", "Some formal CPD", "Structured programme"]),
+        ("AI Working Group or Champions established?", ["No", "A few staff", "Informal group", "Formal working group"]),
+        ("Parental engagement/comms regarding AI?", ["None", "Planned", "Active"]),
+        ("Student AI Literacy lessons integrated?", ["No", "Ad-hoc", "Systematic"])
+    ],
+    "Proof": [
+        ("Systematic log of AI training completion?", ["No", "Informally", "Partially", "Systematically"]),
+        ("Documentation of tool approval decisions?", ["No", "Informally", "Partially documented", "Fully documented"]),
+        ("Ability to evidence AI governance?", ["Definitely not", "Probably not", "Partially", "Confidently yes"]),
+        ("Biannual AI use surveys (Staff & Students)?", ["No", "Planned", "Active"]),
+        ("Case studies of AI impact documented?", ["No", "A few", "Embedded"])
+    ]
+}
+
 tab1, tab2, tab3, tab4 = st.tabs(["Policy", "Process", "People", "Proof"])
+tabs = [tab1, tab2, tab3, tab4]
+scores = []
 
-with tab1:
-    st.markdown(f"### <span style='color:{BRAND_RED}'>Policy</span>", unsafe_allow_html=True)
-    p1 = st.radio("Formal AI use policy established?", ["No", "In development", "Yes but needs updating", "Yes and current"], key="pol1")
-    p2 = st.radio("AI explicitly referenced in safeguarding policy?", ["No", "Not sure", "Partially", "Yes"], key="pol2")
-    p3 = st.radio("Assessment/Malpractice policy updated?", ["No", "Aware but not done", "In progress", "Complete"], key="pol3")
-    p4 = st.radio("Parental AI consent process established?", ["No", "Planning one", "Complete"], key="pol4")
-    p5 = st.radio("Board/Governor level AI strategy defined?", ["No", "Informal", "Formalized"], key="pol5")
-    score_policy = (score_map.get(p1,0)+score_map.get(p2,0)+score_map.get(p3,0)+score_map.get(p4,0)+score_map.get(p5,0))/5
+for i, (p_name, qs) in enumerate(pillars_data.items()):
+    with tabs[i]:
+        st.markdown(f"### {p_name}")
+        p_scores = []
+        for j, (q_text, opts) in enumerate(qs):
+            ans = st.radio(q_text, opts, key=f"{p_name}_{j}")
+            p_scores.append(score_map.get(ans, 0))
+        scores.append(sum(p_scores) / 5)
 
-with tab2:
-    st.markdown(f"### <span style='color:{BRAND_BLUE}'>Process</span>", unsafe_allow_html=True)
-    r1 = st.radio("Visibility of staff AI tool usage?", ["No idea", "Some awareness", "Mostly", "Full visibility"], key="pro1")
-    r2 = st.radio("Register of approved AI tools created?", ["No", "Planning one", "Partial", "Yes, maintained"], key="pro2")
-    r3 = st.radio("DPIAs completed for current AI tools?", ["No", "Not sure", "For some tools", "Yes, for all"], key="pro3")
-    r4 = st.radio("Feedback loops for staff using AI?", ["No", "Informal", "Regularly scheduled"], key="pro4")
-    r5 = st.radio("Procurement process includes AI-specific vetting?", ["No", "Sometimes", "Always"], key="pro5")
-    score_process = (score_map.get(r1,0)+score_map.get(r2,0)+score_map.get(r3,0)+score_map.get(r4,0)+score_map.get(r5,0))/5
-
-with tab3:
-    st.markdown(f"### <span style='color:{BRAND_ORANGE}'>People</span>", unsafe_allow_html=True)
-    l1 = st.radio("Named person leading on AI strategy?", ["No", "Informally", "Yes but unsupported", "Yes with dedicated time"], key="peo1")
-    l2 = st.radio("Staff received formal AI training?", ["None", "Self-directed only", "Some formal CPD", "Structured programme"], key="peo2")
-    l3 = st.radio("AI Working Group or Champions established?", ["No", "A few staff", "Informal group", "Formal working group"], key="peo3")
-    l4 = st.radio("Parental engagement/comms regarding AI?", ["None", "Planned", "Active"], key="peo4")
-    l5 = st.radio("Student AI Literacy lessons integrated?", ["No", "Ad-hoc", "Systematic"], key="peo5")
-    score_people = (score_map.get(l1,0)+score_map.get(l2,0)+score_map.get(l3,0)+score_map.get(l4,0)+score_map.get(l5,0))/5
-
-with tab4:
-    st.markdown(f"### <span style='color:{BRAND_GREEN}'>Proof</span>", unsafe_allow_html=True)
-    v1 = st.radio("Systematic log of AI training completion?", ["No", "Informally", "Partially", "Systematically"], key="pru1")
-    v2 = st.radio("Documentation of tool approval decisions?", ["No", "Informally", "Partially documented", "Fully documented"], key="pru2")
-    v3 = st.radio("Ability to evidence AI governance?", ["Definitely not", "Probably not", "Partially", "Confidently yes"], key="pru3")
-    v4 = st.radio("Biannual AI use surveys (Staff & Students)?", ["No", "Planned", "Active"], key="pru4")
-    v5 = st.radio("Case studies of AI impact documented?", ["No", "A few", "Embedded"], key="pru5")
-    score_proof = (score_map.get(v1,0)+score_map.get(v2,0)+score_map.get(v3,0)+score_map.get(v4,0)+score_map.get(v5,0))/5
+score_policy, score_process, score_people, score_proof = scores
 
 # --- GENERATE RESULTS ---
 if st.button("GENERATE MY 90-DAY PLAN"):
@@ -166,8 +179,6 @@ if st.button("GENERATE MY 90-DAY PLAN"):
     else:
         # Chart
         categories = ['Policy', 'Process', 'People', 'Proof']
-        scores = [score_policy, score_process, score_people, score_proof]
-        
         fig = go.Figure()
         fig.add_trace(go.Scatterpolar(r=scores + [scores[0]], theta=categories + [categories[0]], fill='toself', line_color=BRAND_RED, fillcolor='rgba(233, 69, 96, 0.2)'))
         fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 3])), paper_bgcolor=BG_DARK, font_color="white", showlegend=False)
@@ -177,21 +188,31 @@ if st.button("GENERATE MY 90-DAY PLAN"):
         st.header("🎯 Your 90-Day Commitments")
         plan_html = ""
         
-        pillars = [
-            ("Policy", score_policy, BRAND_RED, "Draft standalone AI Use Policy; Update Safeguarding & Malpractice policies; Define parental consent workflows."),
-            ("Process", score_process, BRAND_BLUE, "Conduct staff AI tool audit; Complete DPIAs for core tools; Maintain an Approved Tool Register."),
-            ("People", score_people, BRAND_ORANGE, "Appoint a named AI Lead; Establish AI Working Group/Champions; Launch structured Staff CPD."),
-            ("Proof", score_proof, BRAND_GREEN, "Log AI training records systematically; Document tool approval decisions; Prepare Governance evidence report.")
-        ]
+        actions = {
+            "Policy": ["Draft standalone AI Use Policy", "Update Safeguarding & Malpractice policies", "Define parental consent workflows"],
+            "Process": ["Conduct staff AI tool audit", "Complete DPIAs for core tools", "Maintain an Approved Tool Register"],
+            "People": ["Appoint a named AI Lead", "Establish AI Working Group/Champions", "Launch structured Staff CPD"],
+            "Proof": ["Log AI training records systematically", "Document tool approval decisions", "Prepare Governance evidence report"]
+        }
         
-        for p_name, p_score, p_color, p_txt in pillars:
-            with st.expander(f"{p_name} Actions", expanded=(p_score < 2)):
-                st.write(p_txt)
-                plan_html += f"<p><strong>{p_name} Pillar:</strong><br>{p_txt}</p>"
+        colors = [BRAND_RED, BRAND_BLUE, BRAND_ORANGE, BRAND_GREEN]
+        for idx, p_name in enumerate(categories):
+            p_score = scores[idx]
+            p_actions = actions[p_name]
+            
+            with st.expander(f"{p_name} Pillar Actions", expanded=(p_score < 2)):
+                for a in p_actions:
+                    st.write(f"✅ {a}")
+                
+                # HTML for Email
+                plan_html += f"<h4 style='color: {colors[idx]}; margin-bottom: 5px;'>{p_name} Actions:</h4><ul style='margin-top: 0; padding-left: 20px;'>"
+                for a in p_actions:
+                    plan_html += f"<li style='margin-bottom: 5px;'>{a}</li>"
+                plan_html += "</ul>"
 
-        # Format Scores for Email
-        score_sum = f"Policy: {round(score_policy,1)}, Process: {round(score_process,1)}, People: {round(score_people,1)}, Proof: {round(score_proof,1)}"
+        # Format Scores summary string
+        score_sum = f"Policy: {round(score_policy,1)} | Process: {round(score_process,1)} | People: {round(score_people,1)} | Proof: {round(score_proof,1)}"
         
         if send_email(email, name, school, score_sum, plan_html):
-            st.success(f"Excellent, {name}. Your plan has been sent to {email}!")
+            st.success(f"Success! Your plan has been sent to {email}!")
             st.balloons()
