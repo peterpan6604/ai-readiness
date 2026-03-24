@@ -450,8 +450,8 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
 # --- APP UI ---
 st.markdown(f"""
 <div class="logo-container">
-    <img src="{ICON_URL}" width="60" style="margin-bottom: 8px;"><br>
-    <img src="{LOGO_URL}" width="200">
+    <img src="{ICON_URL}" width="200" style="margin-bottom: 8px;"><br>
+    <img src="{LOGO_URL}" width="400">
 </div>
 """, unsafe_allow_html=True)
 st.caption("AI READINESS TOOL")
