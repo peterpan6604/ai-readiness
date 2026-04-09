@@ -439,7 +439,7 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
         server.starttls()
         server.login(st.secrets["email_user"], st.secrets["email_password"])
         recipients = [to_email, st.secrets['admin_email']]
-        server.sendmail(st.secrets["email_user"], recipients, msg.as_string())
+        server.sendmail(st.secrets["email_alias"], recipients, msg.as_string())
         server.quit()
         return True
     except Exception as e:
