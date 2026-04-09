@@ -389,13 +389,8 @@ def generate_pdf(user_name, school_name, scores, detailed_actions):
 # --- EMAIL FUNCTION ---
 def send_email(to_email, user_name, school_name, scores_summary, plan_html_content):
     try:
-        msg = MIMEMultipart("alternative")
-        friendly_name = "Peter | Odyssey Learning Solutions"
-        msg['From'] = f"{friendly_name} <{st.secrets['email_alias']}>"
-        msg['To'] = to_email
-        msg['Cc'] = st.secrets['admin_email']
-        msg['Reply-To'] = st.secrets['email_alias']
-        msg['Subject'] = f"Your AI Readiness Results - {school_name}"
+        import requests
+        api_key = st.secrets["brevo_api_key"]
 
         html_body = f"""
         <html>
@@ -417,15 +412,15 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
                     <p style="font-size: 14px; margin: 0; font-family: 'Courier New', monospace; color: {STARK_WHITE};">{scores_summary}</p>
                 </div>
                 <h3 style="color: {ODYSSEY_GOLD}; text-transform: uppercase; border-bottom: 2px solid {SLATE_GREY}; padding-bottom: 5px; font-size: 18px;">90-Day Actions</h3>
-                <p style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">The actions below are tailored to where your scores suggest the biggest gaps. For any pillar scoring below 2, I've expanded the detail - these are the areas worth prioritising in the next term.</p>
+                <p style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">The actions below are tailored to where your scores suggest the biggest gaps.</p>
                 <div style="color: {STARK_WHITE};">{plan_html_content}</div>
                 <div style="margin-top: 30px; padding: 20px; border-left: 4px solid {ODYSSEY_GOLD}; background-color: #222;">
                     <p style="margin: 0; font-size: 14px; line-height: 1.6;">
                         <strong>WHAT NEXT?</strong><br>
-                        This is meant to be a conversation starter, not a finished strategy. If you'd like to talk through these results or want support putting a plan together, just reply to this email. Happy to help.
+                        This is meant to be a conversation starter, not a finished strategy. If you would like to talk through these results or want support putting a plan together, just reply to this email.
                     </p>
                 </div>
-                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid {SLATE_GREY}; text-align: left;">
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid {SLATE_GREY};">
                     <p style="margin: 0; font-weight: bold; color: {ODYSSEY_GOLD}; font-size: 18px;">PETER</p>
                     <p style="margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Founder | Odyssey Learning Solutions</p>
                     <p style="margin: 5px 0 0 0; font-size: 12px; color: {SLATE_GREY};">peter@odysseylearningsolutions.com</p>
@@ -434,16 +429,30 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
         </body>
         </html>
         """
-        msg.attach(MIMEText(html_body, 'html'))
-        server = smtplib.SMTP(st.secrets["email_host"], st.secrets["email_port"])
-        server.starttls()
-        server.login(st.secrets["email_user"], st.secrets["email_password"])
-        recipients = [to_email, st.secrets['admin_email']]
-        server.sendmail(st.secrets["email_alias"], recipients, msg.as_string())
-        server.quit()
-        return True
+
+        payload = {
+            "sender": {"name": "Peter | Odyssey Learning Solutions", "email": "peter@odysseylearningsolutions.com"},
+            "to": [{"email": to_email}],
+            "cc": [{"email": st.secrets["admin_email"]}],
+            "replyTo": {"email": "peter@odysseylearningsolutions.com"},
+            "subject": f"Your AI Readiness Results - {school_name}",
+            "htmlContent": html_body
+        }
+
+        response = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers={"api-key": api_key, "Content-Type": "application/json"},
+            json=payload
+        )
+
+        if response.status_code == 201:
+            return True
+        else:
+            st.error(f"Email could not be sent. ({response.text})")
+            return False
+
     except Exception as e:
-        st.error(f"Email couldn't be sent, but your PDF download is ready below. ({e})")
+        st.error(f"Email could not be sent. ({e})")
         return False
 
 
