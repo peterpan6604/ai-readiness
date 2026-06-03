@@ -73,10 +73,12 @@ st.markdown(f"""
     }}
 
     .logo-container {{
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
         padding-top: 8px;
-        margin-bottom: 4px;
-        line-height: 1;
+        margin-bottom: 8px;
         animation: odyFadeUp 0.7s ease both;
     }}
     h1, h2, h3 {{
@@ -487,8 +489,8 @@ def send_email(to_email, user_name, school_name, scores_summary, plan_html_conte
 # --- APP UI ---
 st.markdown(f"""
 <div class="logo-container">
-    <img src="{ICON_URL}" width="88" style="margin-bottom: 4px;"><br>
-    <img src="{LOGO_URL}" width="300">
+    <img src="{ICON_URL}" width="80" alt="">
+    <img src="{LOGO_URL}" width="260" alt="Odyssey Learning Solutions">
 </div>
 """, unsafe_allow_html=True)
 st.caption("AI READINESS TOOL")
