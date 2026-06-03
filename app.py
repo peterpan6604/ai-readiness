@@ -54,10 +54,29 @@ st.markdown(f"""
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
     .stApp {{ background-color: {DEEP_CHARCOAL}; color: {STARK_WHITE}; font-family: 'Arial', sans-serif; }}
 
+    /* --- MOTION --- */
+    @keyframes odyFadeUp {{
+        from {{ opacity: 0; transform: translateY(14px); }}
+        to   {{ opacity: 1; transform: translateY(0); }}
+    }}
+    @keyframes odyFadeIn {{
+        from {{ opacity: 0; }}
+        to   {{ opacity: 1; }}
+    }}
+    @keyframes odyGoldSweep {{
+        from {{ width: 0; }}
+        to   {{ width: 60px; }}
+    }}
+    /* Respect users who prefer no motion */
+    @media (prefers-reduced-motion: reduce) {{
+        *, *::before, *::after {{ animation: none !important; transition: none !important; }}
+    }}
+
     .logo-container {{
         text-align: center;
         padding-top: 20px;
         margin-bottom: -10px;
+        animation: odyFadeUp 0.7s ease both;
     }}
     h1, h2, h3 {{
         font-family: 'Montserrat', sans-serif;
@@ -80,8 +99,14 @@ st.markdown(f"""
         font-weight: 800;
         border: none;
         text-transform: uppercase;
+        transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
     }}
-    .stButton>button:hover {{ background-color: {STARK_WHITE}; color: {MATTE_BLACK}; }}
+    .stButton>button:hover {{
+        background-color: {STARK_WHITE};
+        color: {MATTE_BLACK};
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(241, 181, 0, 0.25);
+    }}
 
     div[data-testid="stExpander"] {{
         background-color: {MATTE_BLACK};
@@ -113,6 +138,7 @@ st.markdown(f"""
         border-left: 3px solid {ODYSSEY_GOLD};
         padding-left: 15px;
         margin-bottom: 20px;
+        animation: odyFadeUp 0.5s ease both;
     }}
     .action-title {{
         color: {ODYSSEY_GOLD};
@@ -580,7 +606,8 @@ if st.button("GENERATE MY ACTION PLAN"):
 
         st.markdown(
             f'<p style="font-size: 14px; line-height: 1.6; color: {STARK_WHITE}; '
-            f'padding: 15px; background-color: {MATTE_BLACK}; border-left: 3px solid {ODYSSEY_GOLD};">'
+            f'padding: 15px; background-color: {MATTE_BLACK}; border-left: 3px solid {ODYSSEY_GOLD}; '
+            f'animation: odyFadeUp 0.6s ease both;">'
             f'{summary_note}</p>',
             unsafe_allow_html=True
         )
@@ -600,9 +627,10 @@ if st.button("GENERATE MY ACTION PLAN"):
             shown_actions[p_name] = p_actions
             with st.expander(f"{p_name} - SCORE: {round(p_score, 1)}/3", expanded=(p_score < 2)):
                 plan_html += f"<h4 style='color: {ODYSSEY_GOLD}; text-transform: uppercase; margin-bottom: 10px;'>{p_name} (Score: {round(p_score, 1)}/3)</h4>"
-                for title, desc in p_actions:
+                for ai, (title, desc) in enumerate(p_actions):
+                    delay = round(ai * 0.08, 2)
                     st.markdown(
-                        f"""<div class='action-item'>
+                        f"""<div class='action-item' style='animation-delay: {delay}s;'>
                             <span class='action-title'>{title}</span>
                             <span class='action-desc'>{desc}</span>
                         </div>""",
